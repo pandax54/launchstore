@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+        {% block head %}
+            <title>Launchstore</title>
+        {% endblock %}
+        {% include "parts/styles.njk" %}
+    </head>
+    <body>
+
+        {% include "parts/messages.njk" %}
+
+        {%include "parts/header.njk" %}
+
+        <section class="main">
+            {% block content %}{% endblock %}
+        </section>
+
+        {%include "parts/footer.njk" %}
+
+        {% block script %}
+
+            <script src="/js/scripts.js"></script>
+            <script src="/js/image-gallery.js"></script>
+
+        {% endblock %}
+
+    </body>
+</html>

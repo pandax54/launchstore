@@ -1,0 +1,100 @@
+{# // Category  #}
+
+<div class="item">
+    <div>Categoria</div>
+    <select name="category_id">
+
+        {% for category in categories %}
+
+            <option value="{{ category.id }}" {% if product.category_id == category.id %} selected="selected" {% endif %}>
+                {{ category.name }}
+            </option>
+
+        {% endfor %}
+
+    </select>
+
+</div>
+
+{# // Name #}
+<div class="item">
+    <div>Título</div>
+    <div>
+        <input type="text" name="name" placeholder="Digite o nome do produto..." value="{{product.name}}">
+    </div>
+</div>
+
+{# // Descrição #}
+<div class="item">
+    <div>Descrição</div>
+    <div>
+        <textarea value="{{product.description}}" name="description" cols="30" rows="10">{{product.description}}</textarea>
+    </div>
+</div>
+
+{# // photo #}
+<div class="item">
+    <div>Fotos</div>
+    <div>
+        <div id="photos-upload">
+            <input id="photos-input" name="photos" type="file" accept="image/*" multiple="multiple" onchange="photoUpload.handleUploadPhoto(event)">
+            <p>Selecione até 6 fotos</p>
+        </div>
+        <div id="photos-preview">
+            {% if files %}
+                {% for image in files %}
+                    <div class="photo" id="{{ image.id }}">
+                        <img src="{{ image.src}}" alt="{{ image.name }}">
+                        <i class="material-icons" onclick="photoUpload.removeOldPhoto(event)">
+                            close</i>
+                    </div>
+                {% endfor %}
+                {# toda vez que eu deletar uma foto o id dela vem para cá #}
+                <input type="hidden" name="removed_files">
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+
+{# // Price #}
+<div class="item">
+    <div>Preço</div>
+    <div>
+        <input id="price" type="text" name="price" placeholder="Digite o preço do produto..." value="{{product.price}}" onkeydown="Mask.apply(this,'formatBRL')">
+    </div>
+    {% if product.old_price %}
+        <input type="hidden" name="old_price" value="{{product.old_price}}">
+    {% endif %}
+</div>
+
+{# // CPF  #}
+<div class="item">
+    <div>CPF</div>
+    <div>
+        <input id="cpf" type="text" name="cpf" placeholder="Digite seu cpf..." onkeydown="Mask.apply(this, 'formatCPF')">
+    </div>
+</div>
+
+{# // quantity #}
+<div class="item">
+    <div>Quantidade</div>
+    <div>
+        <input type="number" name="quantity" placeholder="Estoque disponível" value="{{product.quantity}}">
+    </div>
+</div>
+
+{# // SOMENTE PARA EDIÇÃO- POIS ESSE CAMPO JÁ TEM O DEFAULT DE 1  #}
+{% if product.status %}
+    <div class="item">
+        <div>Disponível ?</div>
+        <div class="round-btn">
+            <span><input type="radio" name="status" value="1" {% if product.status == '1' %} checked="checked" {% endif %}>
+                <p>Sim</p>
+            </span>
+            <span><input type="radio" name="status" value="0" {% if product.status == '0' %} checked="checked" {% endif %}>
+                <p>Não</p>
+            </span>
+        </div>
+    </div>
+{% endif %}

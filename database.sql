@@ -1,0 +1,122 @@
+-- pg_ctl -D /usr/local/var/postgres start
+CREATE TABLE "products" (
+  "id" SERIAL PRIMARY KEY,
+  "category_id" int UNIQUE,
+  "user_id" int UNIQUE,
+  "name" text NOT NULL,
+  "description" text NOT NULL,
+  "old_price" int,
+  "price" int NOT NULL,
+  "quantity" int DEFAULT 0,
+  "status" int DEFAULT 1,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now())
+);
+
+CREATE TABLE "users" (
+  "id" SERIAL PRIMARY KEY,
+  "name" text NOT NULL,
+  "email" text UNIQUE NOT NULL,
+  "password" text NOT NULL,
+  "cpf_cnpj" int UNIQUE NOT NULL,
+  "cep" text,
+  "address" text,
+  "created_at" timestamp DEFAULT (now()),
+  "updated_at" timestamp DEFAULT (now())
+);
+
+CREATE TABLE "categories" (
+  "id" SERIAL PRIMARY KEY,
+  "name" text NOT NULL
+);
+
+CREATE TABLE "files" (
+  "id" SERIAL PRIMARY KEY,
+  "name" text,
+  "path" text NOT NULL,
+  "product_id" int UNIQUE
+);
+
+-- foreign key
+
+ALTER TABLE "products" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
+
+ALTER TABLE "products" ADD FOREIGN KEY ("category_id") REFERENCES "categories" ("id");
+
+ALTER TABLE "files" ADD FOREIGN KEY ("product_id") REFERENCES "products" ("id");
+
+-- create procedure
+CREATE FUNCTION trigger_set_timestamp()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.update_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- triggers auto updated_at products
+CREATE TRIGGER set_timestamp
+BEFORE UPDATE ON products
+FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_timestamp();
+
+-- triggers auto updated_at users
+CREATE TRIGGER set_timestamp
+BEFORE UPDATE ON users
+FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_timestamp();
+
+
+-- CASCADE
+ALTER TABLE "products"
+DROP CONSTRAINT products_user_id_fkey,
+ADD CONSTRAINT products_user_id_fkey
+FOREIGN KEY ("user_id")
+REFERENCES "users" ("id")
+-- quando deletar user, ela deletará os products desse user
+ON DELETE CASCADE;
+
+
+-- agora iremos fazer o mesmo em relação dos products com as files
+ALTER TABLE "files"
+DROP CONSTRAINT files_product_id_fkey,
+ADD CONSTRAINT files_product_id_fkey
+FOREIGN KEY ("product_id")
+REFERENCES "products" ("id")
+ON DELETE CASCADE;
+
+
+-- deletar tudo do banco de dados
+DELETE FROM products;
+DELETE FROM users;
+DELETE FROM files;
+
+-- restart sequence auto_increment from tables ids
+ALTER SEQUENCE products_id_seq RESTART WITH 1;
+ALTER SEQUENCE users_id_seq RESTART WITH 1;
+ALTER SEQUENCE files_id_seq RESTART WITH 1;
+
+
+-- tabela de pedidos
+CREATE TABLE "orders" (
+	"id" SERIAL PRIMARY KEY,
+  "seller_id" int NOT NULL,
+  "buyer_id" int NOT NULL,
+  "product_id" int NOT NULL,
+  "price" int NOT NULL,
+  "quantity" int DEFAULT 0,
+  "total" int NOT NULL,
+  -- "status" text DEFAULT "open" NOT NULL,
+  "created_at" timestamp DEFAULT (now()),
+  "update_at" timestamp DEFAULT (now())
+);
+
+ALTER TABLE "orders" ADD FOREIGN KEY ("seller_id") REFERENCES "users" ("id");
+ALTER TABLE "orders" ADD FOREIGN KEY ("buyer_id") REFERENCES "users" ("id");
+ALTER TABLE "orders" ADD FOREIGN KEY ("product_id") REFERENCES "products" ("id");
+
+-- update_at será atualizado automaticamente sempre que dar update no produto
+CREATE TRIGGER set_timestamp
+BEFORE UPDATE ON orders
+FOR EACH ROW
+EXECUTE PROCEDURE trigger_set_timestamp();
