@@ -6,7 +6,7 @@
 <h3 align="center" >
   An ecommerce based in pure javascript and pure SQL queries
 </h3>
-
+<p align="center">
   <a href="https://www.linkedin.com/in/fernanda-ribeiro-445b3669/" target="_blank" >
     <img alt="Linkedin - Fernanda Penna Ribeiro" src="https://img.shields.io/badge/Linkedin--%23F8952D?style=social&logo=linkedin">
   </a>
@@ -17,6 +17,7 @@
         target="_blank" >
     <img alt="Fale comigo no whatsapp - Fernanda Penna Ribeiro" src="https://img.shields.io/badge/Whatsapp--%23F8952D?style=social&logo=whatsapp">
   </a>
+</p>
 
 </p>
 
